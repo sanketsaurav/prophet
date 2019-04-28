@@ -92,6 +92,7 @@ class TestCommand(test_command):
             sys.modules.update(old_modules)
             working_set.__init__()
 
+
 with open('requirements.txt', 'r') as f:
     install_requires = f.read().splitlines()
 

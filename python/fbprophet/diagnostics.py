@@ -40,13 +40,13 @@ def generate_cutoffs(df, horizon, initial, period):
     while result[-1] >= min(df['ds']) + initial:
         cutoff -= period
         # If data does not exist in data range (cutoff, cutoff + horizon]
-        if not (((df['ds'] > cutoff) & (df['ds'] <= cutoff + horizon)).any()):
+        if not ((df['ds'] > cutoff) & (df['ds'] <= cutoff + horizon)).any():
             # Next cutoff point is 'last date before cutoff in data - horizon'
             closest_date = df[df['ds'] <= cutoff].max()['ds']
             cutoff = closest_date - horizon
         result.append(cutoff)
     result = result[:-1]
-    if len(result) == 0:
+    if not result:
         raise ValueError(
             'Less data than horizon after initial window. '
             'Make horizon or initial shorter.'
@@ -82,8 +82,6 @@ def cross_validation(model, horizon, period=None, initial=None):
     A pd.DataFrame with the forecast, actual value and cutoff.
     """
     df = model.history.copy().reset_index(drop=True)
-    te = df['ds'].max()
-    ts = df['ds'].min()
     horizon = pd.Timedelta(horizon)
     period = 0.5 * horizon if period is None else pd.Timedelta(period)
     initial = 3 * horizon if initial is None else pd.Timedelta(initial)
@@ -124,6 +122,7 @@ def cross_validation(model, horizon, period=None, initial=None):
 
     # Combine all predicted pd.DataFrame into one pd.DataFrame
     return reduce(lambda x, y: x.append(y), predicts).reset_index(drop=True)
+
 
 def prophet_copy(m, cutoff=None):
     """Copy Prophet object

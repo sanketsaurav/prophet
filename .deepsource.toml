@@ -1,0 +1,12 @@
+version = 1
+
+exclude_patterns = []
+
+test_patterns = [
+  'python/fbprophet/tests/*'
+]
+
+[[analyzers]]
+name = 'python'
+enabled = true
+runtime_version = '3.x.x'

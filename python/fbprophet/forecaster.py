@@ -332,7 +332,7 @@ class Prophet(object):
         3) The user prefers no changepoints be used.
         """
         if self.changepoints is not None:
-            if len(self.changepoints) == 0:
+            if not self.changepoints:
                 pass
             else:
                 too_low = min(self.changepoints) < self.history['ds'].min()
@@ -354,8 +354,8 @@ class Prophet(object):
             if self.n_changepoints > 0:
                 cp_indexes = (
                     np.linspace(0, hist_size - 1, self.n_changepoints + 1)
-                        .round()
-                        .astype(np.int)
+                    .round()
+                    .astype(np.int)
                 )
                 self.changepoints = (
                     self.history.iloc[cp_indexes]['ds'].tail(-1)
@@ -363,7 +363,7 @@ class Prophet(object):
             else:
                 # set empty changepoints
                 self.changepoints = []
-        if len(self.changepoints) > 0:
+        if self.changepoints:
             self.changepoints_t = np.sort(np.array(
                 (self.changepoints - self.start) / self.t_scale))
         else:
@@ -387,8 +387,8 @@ class Prophet(object):
         # convert to days since epoch
         t = np.array(
             (dates - pd.datetime(1970, 1, 1))
-                .dt.total_seconds()
-                .astype(np.float)
+            .dt.total_seconds()
+            .astype(np.float)
         ) / (3600 * 24.)
         return np.column_stack([
             fun((2.0 * (i + 1) * np.pi * t / period))
@@ -746,7 +746,7 @@ class Prophet(object):
             modes[props['mode']].append(name)
 
         # Dummy to prevent empty X
-        if len(seasonal_features) == 0:
+        if not seasonal_features:
             seasonal_features.append(
                 pd.DataFrame({'zeros': np.zeros(df.shape[0])}))
             prior_scales.append(1.)
@@ -815,8 +815,8 @@ class Prophet(object):
         component_cols.drop('zeros', axis=1, inplace=True, errors='ignore')
         # Validation
         if (
-                max(component_cols['additive_terms']
-                    + component_cols['multiplicative_terms']) > 1
+                max(component_cols['additive_terms'] +
+                    component_cols['multiplicative_terms']) > 1
         ):
             raise Exception('A bug occurred in seasonal components.')
         # Compare to the training, if set.
@@ -842,7 +842,7 @@ class Prophet(object):
         """
         new_comp = components[components['component'].isin(set(group))].copy()
         group_cols = new_comp['col'].unique()
-        if len(group_cols) > 0:
+        if group_cols:
             new_comp = pd.DataFrame({'col': group_cols, 'component': name})
             components = components.append(new_comp)
         return components
@@ -1126,7 +1126,7 @@ class Prophet(object):
                 self.params[par] = params[par].reshape((1, -1))
 
         # If no changepoints were requested, replace delta with 0s
-        if len(self.changepoints) == 0:
+        if not self.changepoints:
             # Fold delta into the base rate k
             self.params['k'] = self.params['k'] + self.params['delta']
             self.params['delta'] = np.zeros(self.params['delta'].shape)

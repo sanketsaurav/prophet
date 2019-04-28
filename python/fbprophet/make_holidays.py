@@ -66,4 +66,4 @@ def make_holidays_df(year_list, country):
     holidays_df = pd.DataFrame(list(holidays.items()), columns=['ds', 'holiday'])
     holidays_df.reset_index(inplace=True, drop=True)
     holidays_df['ds'] = pd.to_datetime(holidays_df['ds'])
-    return (holidays_df)
+    return holidays_df
